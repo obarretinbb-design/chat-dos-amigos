@@ -1,19 +1,21 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import base64
+import os
 
-app = Flask(__name__)
-app.secret_key = "chave_secreta_aqui" # Pode ser qualquer texto
+app = Flask(__name__, template_folder='templates', static_folder='static')
+app.secret_key = "chave_mestra_snoop"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
 db = SQLAlchemy(app)
 
-# Modelo do Banco de Dados para salvar mensagens
 class Mensagem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     usuario = db.Column(db.String(50))
     texto = db.Column(db.String(500))
+    imagem = db.Column(db.Text) 
     data = db.Column(db.DateTime, default=datetime.now)
-
+    
 with app.app_context():
     db.create_all()
 
@@ -22,7 +24,7 @@ def login():
     if request.method == 'POST':
         senha = request.form.get('senha')
         nome = request.form.get('nome')
-        if senha == "SALVEM US": # <--- COLOQUE SUA SENHA AQUI
+        if senha == "SALVEM US": # Sua senha
             session['usuario'] = nome
             return redirect(url_for('chat'))
     return render_template('login.html')
@@ -31,11 +33,17 @@ def login():
 def chat():
     if 'usuario' not in session:
         return redirect(url_for('login'))
-    
+        
     if request.method == 'POST':
-        novo_texto = request.form.get('mensagem')
-        if novo_texto:
-            nova_msg = Mensagem(usuario=session['usuario'], texto=novo_texto)
+        texto = request.form.get('mensagem')
+        arquivo = request.files.get('foto')
+        img_base64 = None
+        
+        if arquivo and arquivo.filename != '':
+            img_base64 = base64.b64encode(arquivo.read()).decode('utf-8')
+        
+        if texto or img_base64:
+            nova_msg = Mensagem(usuario=session['usuario'], texto=texto, imagem=img_base64)
             db.session.add(nova_msg)
             db.session.commit()
             
