@@ -1,14 +1,32 @@
-<link rel="stylesheet" href="/static/style.css">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <meta http-equiv="refresh" content="7"> 
+</head>
+<body>
 <div class="chat-wrapper">
-    <div class="chat-box">
+    <div class="header">SNOOP PRO 📸</div>
+    <div class="chat-box" id="box">
         {% for m in mensagens %}
             <div class="msg {% if m.usuario == nome_usuario %}minha{% endif %}">
-                <strong>{{ m.usuario }}:</strong> {{ m.texto }}
+                <small style="opacity: 0.6; font-size: 0.8em;">{{ m.usuario }}</small>
+                {% if m.imagem %}
+                    <img src="data:image/png;base64,{{ m.imagem }}" class="chat-img">
+                {% endif %}
+                {% if m.texto %}<p style="margin: 5px 0 0 0;">{{ m.texto }}</p>{% endif %}
             </div>
         {% endfor %}
     </div>
-    <form method="POST" class="input-area">
-        <input type="text" name="mensagem" placeholder="Digite sua mensagem..." required>
+
+    <form method="POST" class="input-area" enctype="multipart/form-data">
+        <label for="foto-input" class="btn-foto">🖼️</label>
+        <input type="file" id="foto-input" name="foto" accept="image/*" style="display:none;">
+        <input type="text" name="mensagem" placeholder="Mensagem..." autocomplete="off">
         <button type="submit">Enviar</button>
     </form>
 </div>
+<script>var objDiv = document.getElementById("box"); objDiv.scrollTop = objDiv.scrollHeight;</script>
+</body>
+</html>
