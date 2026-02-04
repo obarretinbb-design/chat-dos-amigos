@@ -1,0 +1,14 @@
+<link rel="stylesheet" href="/static/style.css">
+<div class="chat-wrapper">
+    <div class="chat-box">
+        {% for m in mensagens %}
+            <div class="msg {% if m.usuario == nome_usuario %}minha{% endif %}">
+                <strong>{{ m.usuario }}:</strong> {{ m.texto }}
+            </div>
+        {% endfor %}
+    </div>
+    <form method="POST" class="input-area">
+        <input type="text" name="mensagem" placeholder="Digite sua mensagem..." required>
+        <button type="submit">Enviar</button>
+    </form>
+</div>
